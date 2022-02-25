@@ -13,10 +13,13 @@ import android.text.TextUtils
 import android.util.Log
 import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.auth.User
 import com.google.firebase.storage.FirebaseStorage
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
+
 
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var userName: EditText
@@ -27,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var profileBtn: ImageView
     private val pickImage = 100
     private var imageUri: Uri? = null
+    private lateinit var circular_image:ImageView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +44,8 @@ class MainActivity : AppCompatActivity() {
         btnRegister = findViewById(R.id.btn_register)
         loginTxt = findViewById(R.id.login_text)
         profileBtn = findViewById(R.id.profile_btn)
+        circular_image = findViewById(R.id.Cimage)
+
 
 
 
@@ -94,8 +100,26 @@ class MainActivity : AppCompatActivity() {
         ref.putFile(selectedPhotouri!!)
             .addOnSuccessListener {
                 Log.d("MainActivity","Photo uploaded successful: ${it.metadata?.path}")
+
+                ref.downloadUrl.addOnSuccessListener {
+                    it.toString()
+
+                    saveUserToDatabase()
+                }
             }
 
+    }
+
+    private fun saveUserToDatabase() {
+        val uid = FirebaseAuth.getInstance().uid?:""
+       val ref =  FirebaseDatabase.getInstance().getReference("/users/$uid")
+
+        val user = Users(uid,userName.text.toString())
+
+        ref.setValue(user)
+            .addOnSuccessListener {
+                Toast.makeText(this,"Saved to firebase database.",Toast.LENGTH_LONG).show()
+            }
     }
 
     var selectedPhotouri:Uri? = null
@@ -107,12 +131,20 @@ class MainActivity : AppCompatActivity() {
             selectedPhotouri = data.data
 
             val bitmap = MediaStore.Images.Media.getBitmap(contentResolver,selectedPhotouri)
-            val bitmapDrawable = BitmapDrawable(bitmap)
-            profileBtn.setBackgroundDrawable(bitmapDrawable)
+            circular_image.setImageBitmap(bitmap)
+
+            profileBtn.alpha = 0f
+
+            //val bitmapDrawable = BitmapDrawable(bitmap)
+            //profileBtn.setBackgroundDrawable(bitmapDrawable)
 
 
         }
     }
+
+
+}
+class Users(val uid: String,val userName:String){
 
 
 }
