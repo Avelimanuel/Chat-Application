@@ -1,5 +1,6 @@
 package com.example.wechat
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -29,6 +30,9 @@ class LoginActivity : AppCompatActivity() {
         LoginBtn.setOnClickListener {
             signInUser()
 
+
+
+
         }
     }
 
@@ -40,6 +44,14 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener { task->
                 if (task.isSuccessful){
                     Toast.makeText(this,"Login success",Toast.LENGTH_LONG).show()
+
+                    //Starting an intent activity to launch latest messages activity.
+                    val intent = Intent(this,LatestMessagesActivity::class.java)
+
+                    //Clearing older tasks
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+
                 }
 
             }

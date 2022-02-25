@@ -119,6 +119,8 @@ class MainActivity : AppCompatActivity() {
         ref.setValue(user)
             .addOnSuccessListener {
                 Toast.makeText(this,"Saved to firebase database.",Toast.LENGTH_LONG).show()
+
+
             }
     }
 
